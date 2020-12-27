@@ -2,26 +2,52 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/thatisuday/commando"
+	"unicode"
 )
 
+const (
+	asciiA = int('A')
+	asciiZ = int('Z')
+)
+
+func toAscii(plaintext string) (asciiStream []int) {
+	for pos := 0; pos < len(asciiStream); pos++ {
+		asciiStream[pos] = int(plaintext[pos])
+	}
+	return
+}
+
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-	fmt.Printf("Printing options of the `root` command...\n\n")
+	message := args["message"].Value
+	shiftKey, _ := flags["key"].GetInt()
 
-	// print arguments
-	for k, v := range args {
-		fmt.Printf("arg -> %v: %v(%T)\n", k, v.Value, v.Value)
+	var output string
+	var shiftedCode int
+	possibleOutputs := make([]string, 2)
+	directions := []int{-1, 1}
+	switch flags["process"].Value {
+	case "encrypt":
+		for pos, dir := range directions {
+			output = ""
+			for _, code := range toAscii(message) {
+				shiftedCode = code + dir*shiftKey
+				if !unicode.IsLetter(rune(code)) {
+					shiftedCode = code
+				} else if shiftedCode < asciiA {
+					shiftedCode = asciiZ - (asciiA - shiftedCode - 1)
+				} else if shiftedCode > asciiZ {
+					shiftedCode = asciiA - (asciiZ - shiftedCode + 1)
+				}
+				output += string(rune(shiftedCode))
+			}
+			possibleOutputs[pos] = output
+		}
 	}
-
-	// print flags
-	for k, v := range flags {
-		fmt.Printf("flag -> %v: %v(%T)\n", k, v.Value, v.Value)
-	}
+	fmt.Printf("The message is either:\n\t%v", possibleOutputs)
 }
 
 func main() {
-	fmt.Println("Hello World")
 	// configure commando
 	commando.
 		SetExecutableName("cipher").
