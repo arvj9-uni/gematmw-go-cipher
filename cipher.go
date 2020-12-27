@@ -12,7 +12,15 @@ const (
 	//space  int = ' '
 )
 
+func printPossibleOutputs(possibleOutputs []string) {
+	for _, word := range possibleOutputs {
+		fmt.Printf("\t%v\n", word)
+	}
+}
+
+// Transforms a string to an array of each character's ASCII value
 func toAscii(plaintext string) (asciiStream []int) {
+	asciiStream = make([]int, len(plaintext))
 	for pos := 0; pos < len(asciiStream); pos++ {
 		asciiStream[pos] = int(plaintext[pos])
 	}
@@ -27,30 +35,32 @@ func _shift(message string, shiftKey int) string {
 		// Handles uppercase lowercase situations
 		var folded bool
 		if unicode.IsLower(rune(code)) {
-			code = int(unicode.SimpleFold(rune(code)))
+			code = int(unicode.ToUpper(rune(code)))
 			folded = true
-			fmt.Println(code)
 		}
 
 		shiftedCode = code + shiftKey
+
+		// Control flow for non alphabet characters
 		if !unicode.IsLetter(rune(code)) {
 			shiftedCode = code
-			fmt.Printf("%v\n",rune(code))
 		} else if shiftedCode < asciiA {
 			shiftedCode = asciiZ - (asciiA - shiftedCode - 1)
 		} else if shiftedCode > asciiZ {
 			shiftedCode = asciiA - (asciiZ - shiftedCode + 1)
 		}
+
+		// reverts character case if changed
 		if folded {
-			shiftedCode = int(unicode.SimpleFold(rune(shiftedCode)))
+			shiftedCode = int(unicode.ToLower(rune(shiftedCode)))
 		}
+
 		output += string(rune(shiftedCode))
-		fmt.Println("I passed!")
-		fmt.Println(output)
 	}
 	return output
 }
 
+// shift cipher callback
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	// copies of arguments
 	message := args["message"].Value
@@ -65,11 +75,18 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
 		}
 	case "decrypt":
-		if shiftKey != 0 {
-
+		if shiftKey == 0 {
+			for shift := 1; shift <= 25; shift++ {
+				possibleOutputs = append(possibleOutputs, _shift(message, shift))
+			}
+			break
+		}
+		for _, dir := range directions {
+			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
 		}
 	}
-	fmt.Printf("The message is either:\n\t%v of length %v", possibleOutputs, len(possibleOutputs))
+	fmt.Println("The message is among the following:")
+	printPossibleOutputs(possibleOutputs)
 }
 
 func main() {
