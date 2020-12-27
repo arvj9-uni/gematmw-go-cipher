@@ -35,4 +35,7 @@ func main() {
 		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
 		AddFlag("key,k", "shift key", commando.Int, 0).
 		SetAction(shiftCipher)
+
+	// parse command-line arguments
+	commando.Parse(nil)
 }
