@@ -20,10 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f0409f2d-fcfc-4523-a0b0-89cfd4dc962a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/resources/google-10000-english" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cipher.go" beforeDir="false" afterPath="$PROJECT_DIR$/cipher.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/commonWords.txt" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/20k.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/google-10000-english" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +139,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609181264140</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Revised gibberish handling">
+      <created>1609183361958</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1609183361958</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -166,7 +171,8 @@
     <MESSAGE value="Atbash Cipher created; Multiple output filtered" />
     <MESSAGE value="README edit" />
     <MESSAGE value="Revised case handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="Revised case handling" />
+    <MESSAGE value="Revised gibberish handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Revised gibberish handling" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
