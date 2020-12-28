@@ -27,6 +27,9 @@ func toAscii(plaintext string) (asciiStream []int) {
 	return
 }
 
+/*
+	# SHIFT CIPHER
+*/
 // shift cipher helper function
 func _shift(message string, shiftKey int) string {
 	var output string
@@ -88,6 +91,10 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 	fmt.Println("The message is among the following:")
 	printPossibleOutputs(possibleOutputs)
 }
+
+/*
+	#
+*/
 
 func main() {
 	// configure commando
