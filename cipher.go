@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	mostCommonWords           = "Z:\\GitHub\\gematmw-go-cipher\\resources\\google-10000-english\\20k.txt"
 	englishAlphabetLength     = 26
 	ascii_a               int = 'a'
 	ascii_z               int = 'z'
@@ -44,7 +45,7 @@ func scanLines(path string) ([]string, error) {
 }
 
 func hasWord(str string) bool {
-	words, err := scanLines("./resources/commonWords.txt")
+	words, err := scanLines(mostCommonWords)
 	if err != nil {
 		panic(err)
 	}
@@ -52,6 +53,7 @@ func hasWord(str string) bool {
 	for _, field := range strings.Fields(str) {
 		for _, word := range words {
 			if field == word {
+				fmt.Print(field)
 				return true
 			}
 		}
