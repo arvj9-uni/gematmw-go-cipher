@@ -52,7 +52,7 @@ func hasWord(str string) bool {
 
 	for _, field := range strings.Fields(str) {
 		for _, word := range words {
-			if field == word {
+			if strings.ToLower(field) == word {
 				fmt.Println(field)
 				return true
 			}
