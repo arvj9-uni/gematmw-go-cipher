@@ -1,19 +1,83 @@
+/*
+Package gematmw-go-cipher is a CLI tool that encrypts and
+decrypts messages using different cipher methods.
+*/
+
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/thatisuday/commando"
+	"os"
+	"strings"
 	"unicode"
 )
 
 const (
-	asciiA int = 'A'
-	asciiZ int = 'Z'
+	englishAlphabetLength     = 26
+	asciiA                int = 'A'
+	asciiZ                int = 'Z'
 	//space  int = ' '
+
 )
 
-func printPossibleOutputs(possibleOutputs []string) {
-	for _, word := range possibleOutputs {
+/*	Scans a text file line-by-line
+	Keyword Arguments:
+	path --
+*/
+func scanLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err = file.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	var lines []string
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, nil
+}
+
+func hasWord(str string) bool {
+	words, err := scanLines("./resources/commonWords.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	var containsWord bool
+	for _, word := range words {
+		containsWord = strings.Contains(str, word)
+		if containsWord {
+			return containsWord
+		}
+	}
+	return containsWord
+}
+
+// removes string element from list
+func remove(slice []string, i int) []string {
+	slice[len(slice)-1], slice[i] = slice[i], slice[len(slice)-1]
+	return slice[:len(slice)-1]
+}
+
+func filterGibberish(possibleOutputs []string) []string {
+	for pos, possibleOutput := range possibleOutputs {
+		if !hasWord(possibleOutput) {
+			remove(possibleOutputs, pos)
+		}
+	}
+	return possibleOutputs
+}
+
+func printOutputs(outputs []string) {
+	for _, word := range outputs {
 		fmt.Printf("\t%v\n", word)
 	}
 }
@@ -27,10 +91,41 @@ func toAscii(plaintext string) (asciiStream []int) {
 	return
 }
 
-/*
-	# SHIFT CIPHER
-*/
-// shift cipher helper function
+// The atbash cipher maps each character of an alphabet to its
+// reverse such that the first letter becomes the last letter,
+// the second letter becomes the second to the last letter,
+// and so on.
+func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
+	// copies of arguments
+	message := args["message"].Value
+
+	output := []string{""}
+	for _, code := range toAscii(message) {
+		// Handles uppercase lowercase situations
+		var folded bool
+		if unicode.IsLower(rune(code)) {
+			code = int(unicode.ToUpper(rune(code)))
+			folded = true
+		}
+
+		// [Atbash Cipher Encryption/Decryption Function](https://en.wikipedia.org/wiki/Atbash#Relationship_to_the_affine_cipher)
+		code -= asciiA
+		code = (englishAlphabetLength - 1) * (code + 1) % englishAlphabetLength
+		code += asciiA
+
+		// Reverts character case if folded
+		if folded {
+			code = int(unicode.ToLower(rune(code)))
+		}
+		output[0] += string(rune(code))
+	}
+
+	fmt.Println("The message is now:")
+	printOutputs(output)
+}
+
+// The shift cipher maps each character to the nth character
+// from the original character.
 func _shift(message string, shiftKey int) string {
 	var output string
 	var shiftedCode int
@@ -72,29 +167,35 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 	// init setup for loop
 	directions := [2]int{-1, 1}
 	var possibleOutputs []string
+
+	// encryption and decryption handling
 	switch flags["process"].Value {
 	case "encrypt":
 		for _, dir := range directions {
 			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
 		}
 	case "decrypt":
+		// missing shift key
 		if shiftKey == 0 {
 			for shift := 1; shift <= 25; shift++ {
 				possibleOutputs = append(possibleOutputs, _shift(message, shift))
 			}
+
+			possibleOutputs = filterGibberish(possibleOutputs)
 			break
 		}
+
+		// when shift key is provided
 		for _, dir := range directions {
 			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
 		}
-	}
-	fmt.Println("The message is among the following:")
-	printPossibleOutputs(possibleOutputs)
-}
 
-/*
-	#
-*/
+		possibleOutputs = filterGibberish(possibleOutputs)
+	}
+
+	fmt.Println("The message is among the following:")
+	printOutputs(possibleOutputs)
+}
 
 func main() {
 	// configure commando
@@ -102,6 +203,12 @@ func main() {
 		SetExecutableName("cipher").
 		SetVersion("1.0.0").
 		SetDescription("This CLI application allows one to encrypt and decrypt messages.")
+
+	// configure the atbash command
+	commando.
+		Register("atbash").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		SetAction(atbashCipher)
 
 	// configure the shift command
 	commando.
@@ -111,14 +218,6 @@ func main() {
 		AddFlag("key,k", "shift key", commando.Int, 0).
 		SetAction(shiftCipher)
 
-	// configure the shift command
-	//commando.
-	//	Register("atbash").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.Int, 0).
-	//	SetAction(atbashCipher)
-	//
 	//// configure the shift command
 	//commando.
 	//	Register("vigenere").

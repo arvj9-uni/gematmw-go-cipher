@@ -14,9 +14,7 @@ encrypt and decrypt messages.
 - [ ] Pigpen Cipher (_optional_)
 
 ---
-## Shift Cipher
-The shift cipher takes advantage of the built-in ASCII \
-conversion of the Go language to perform the character \
-shifts.
+# How To
 
-## Atbash Cipher
+# References
+- [Most Common English Words](https://github.com/first20hours/google-10000-english)
