@@ -21,7 +21,7 @@
   <component name="ChangeListManager">
     <list default="true" id="f0409f2d-fcfc-4523-a0b0-89cfd4dc962a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cipher.go" beforeDir="false" afterPath="$PROJECT_DIR$/cipher.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -125,7 +125,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609178606653</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="README edit">
+      <created>1609178682239</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1609178682239</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -148,7 +155,8 @@
     <MESSAGE value="Polished the Shift Cipher" />
     <MESSAGE value="Updated README and Comments" />
     <MESSAGE value="Atbash Cipher created; Multiple output filtered" />
-    <option name="LAST_COMMIT_MESSAGE" value="Atbash Cipher created; Multiple output filtered" />
+    <MESSAGE value="README edit" />
+    <option name="LAST_COMMIT_MESSAGE" value="README edit" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

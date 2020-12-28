@@ -16,16 +16,14 @@ import (
 
 const (
 	englishAlphabetLength     = 26
-	asciiA                int = 'A'
-	asciiZ                int = 'Z'
+	ascii_a               int = 'a'
+	ascii_z               int = 'z'
 	//space  int = ' '
 
 )
 
-/*	Scans a text file line-by-line
-	Keyword Arguments:
-	path --
-*/
+//	The scanLines function scans a text file line-by-line and
+//	returns each line in a string slice.
 func scanLines(path string) ([]string, error) {
 	file, err := os.Open(path)
 	if err != nil {
@@ -51,29 +49,26 @@ func hasWord(str string) bool {
 		panic(err)
 	}
 
-	var containsWord bool
-	for _, word := range words {
-		containsWord = strings.Contains(str, word)
-		if containsWord {
-			return containsWord
+	for _, field := range strings.Fields(str) {
+		for _, word := range words {
+			if field == word {
+				return true
+			}
 		}
 	}
-	return containsWord
+	return false
 }
 
-// removes string element from list
-func remove(slice []string, i int) []string {
-	slice[len(slice)-1], slice[i] = slice[i], slice[len(slice)-1]
-	return slice[:len(slice)-1]
-}
-
+//	Filters possible outputs that do not contain any english
+//	word using the chosen dataset.
 func filterGibberish(possibleOutputs []string) []string {
-	for pos, possibleOutput := range possibleOutputs {
-		if !hasWord(possibleOutput) {
-			remove(possibleOutputs, pos)
+	var outputs []string
+	for _, possibleOutput := range possibleOutputs {
+		if hasWord(possibleOutput) {
+			outputs = append(outputs, possibleOutput)
 		}
 	}
-	return possibleOutputs
+	return outputs
 }
 
 func printOutputs(outputs []string) {
@@ -82,7 +77,8 @@ func printOutputs(outputs []string) {
 	}
 }
 
-// Transforms a string to an array of each character's ASCII value
+//	Transforms a string to an array of each character's ASCII
+//	value.
 func toAscii(plaintext string) (asciiStream []int) {
 	asciiStream = make([]int, len(plaintext))
 	for pos := 0; pos < len(asciiStream); pos++ {
@@ -91,10 +87,10 @@ func toAscii(plaintext string) (asciiStream []int) {
 	return
 }
 
-// The atbash cipher maps each character of an alphabet to its
-// reverse such that the first letter becomes the last letter,
-// the second letter becomes the second to the last letter,
-// and so on.
+//	The atbash cipher maps each character of an alphabet to
+//	its reverse such that the first letter becomes the last
+//	letter, the second letter becomes the second to the last
+//	letter, and so on.
 func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
 	// copies of arguments
 	message := args["message"].Value
@@ -109,9 +105,9 @@ func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagV
 		}
 
 		// [Atbash Cipher Encryption/Decryption Function](https://en.wikipedia.org/wiki/Atbash#Relationship_to_the_affine_cipher)
-		code -= asciiA
+		code -= ascii_a
 		code = (englishAlphabetLength - 1) * (code + 1) % englishAlphabetLength
-		code += asciiA
+		code += ascii_a
 
 		// Reverts character case if folded
 		if folded {
@@ -124,16 +120,16 @@ func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagV
 	printOutputs(output)
 }
 
-// The shift cipher maps each character to the nth character
-// from the original character.
+//	The shift cipher maps each character to the nth character
+//	from the original character.
 func _shift(message string, shiftKey int) string {
 	var output string
 	var shiftedCode int
 	for _, code := range toAscii(message) {
 		// Handles uppercase lowercase situations
 		var folded bool
-		if unicode.IsLower(rune(code)) {
-			code = int(unicode.ToUpper(rune(code)))
+		if unicode.IsUpper(rune(code)) {
+			code = int(unicode.ToLower(rune(code)))
 			folded = true
 		}
 
@@ -142,15 +138,15 @@ func _shift(message string, shiftKey int) string {
 		// Control flow for non alphabet characters
 		if !unicode.IsLetter(rune(code)) {
 			shiftedCode = code
-		} else if shiftedCode < asciiA {
-			shiftedCode = asciiZ - (asciiA - shiftedCode - 1)
-		} else if shiftedCode > asciiZ {
-			shiftedCode = asciiA - (asciiZ - shiftedCode + 1)
+		} else if shiftedCode < ascii_a {
+			shiftedCode = ascii_z - (ascii_a - shiftedCode - 1)
+		} else if shiftedCode > ascii_z {
+			shiftedCode = ascii_a - (ascii_z - shiftedCode + 1)
 		}
 
 		// reverts character case if changed
 		if folded {
-			shiftedCode = int(unicode.ToLower(rune(shiftedCode)))
+			shiftedCode = int(unicode.ToUpper(rune(shiftedCode)))
 		}
 
 		output += string(rune(shiftedCode))
