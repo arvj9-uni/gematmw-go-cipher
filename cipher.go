@@ -6,22 +6,74 @@ decrypts messages using different cipher methods.
 package main
 
 import (
+	//	Builtin Packages
 	"bufio"
 	"fmt"
-	"github.com/thatisuday/commando"
 	"os"
 	"strings"
 	"unicode"
+	//	Custom Packages
+
+	//	External Packages
+	"github.com/thatisuday/commando"
 )
 
 const (
-	mostCommonWords           = "Z:\\GitHub\\gematmw-go-cipher\\resources\\20k-edited.txt"
-	englishAlphabetLength     = 26
-	ascii_a               int = 'a'
-	ascii_z               int = 'z'
-	//space  int = ' '
-
+	mostCommonWords       string = "Z:\\GitHub\\gematmw-go-cipher\\resources\\20k-edited.txt"
+	englishAlphabetLength int    = 26
+	ascii_a               int    = 'a'
+	ascii_z               int    = 'z'
 )
+
+func main() {
+	// configure commando
+	commando.
+		SetExecutableName("cipher").
+		SetVersion("1.0.0").
+		SetDescription("This CLI application allows one to encrypt and decrypt messages.")
+
+	// configure the atbash command
+	commando.
+		Register("atbash").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		SetAction(atbashCipher)
+
+	// configure the shift command
+	commando.
+		Register("shift").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("key,k", "shift key", commando.Int, 0).
+		SetAction(shiftCipher)
+
+	// configure the shift command
+	commando.
+		Register("vigenere").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("key,k", "shift key", commando.String, "a").
+		SetAction(vigenereCipher)
+
+	//// configure the shift command
+	//commando.
+	//	Register("rail").
+	//	AddArgument("message", "message to encrypt/decrypt", "").
+	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+	//	AddFlag("key,k", "shift key", commando.Int, 0).
+	//	SetAction(railFenceCipher)
+	//
+	//// configure the shift command
+	//commando.
+	//	Register("rsa").
+	//	AddArgument("message", "message to encrypt/decrypt", "").
+	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+	//	AddFlag("key,k", "shift key", commando.Int, 0).
+	//	SetAction(RSACipher)
+
+	// parse command-line arguments
+	commando.Parse(nil)
+}
 
 //	The scanLines function scans a text file line-by-line and
 //	returns each line in a string slice.
@@ -60,8 +112,8 @@ func hasWord(str string) bool {
 	return false
 }
 
-//	Filters possible outputs that do not contain any english
-//	word using the chosen dataset.
+//	filterGibberish removes items from possible outputs that
+//	do not contain any english word using the chosen wordlist.
 func filterGibberish(possibleOutputs []string) []string {
 	var outputs []string
 	for _, possibleOutput := range possibleOutputs {
@@ -72,6 +124,8 @@ func filterGibberish(possibleOutputs []string) []string {
 	return outputs
 }
 
+//	printOutputs displays the possible outputs in separate
+//	indented lines.
 func printOutputs(outputs []string) {
 	for _, word := range outputs {
 		fmt.Printf("\t%v\n", word)
@@ -200,23 +254,12 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 	printOutputs(possibleOutputs)
 }
 
-//	Vigenère cipher helper function that repeats the key to
-//	the lenght of the message.
-func fillRepeat(key string, fillLength int) string {
-	for i := 0; i < fillLength/len(key); i++ {
-		key += key
-	}
-	key += key[:fillLength%len(key)]
-	return key
-}
-
 //	Vigenere Cipher
 func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
 
 	//	Key setup for vigenère cipher
 	key, _ := flags["key"].GetString()
-	key = fillRepeat(strings.ToLower(key), len(message))
 	keyCodes := toAscii(key)
 
 	outputs := []string{""}
@@ -231,69 +274,37 @@ func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando
 			}
 
 			code -= ascii_a
-			keyCodes[pos] -= ascii_a
-			code = (code + keyCodes[pos]) % englishAlphabetLength
+			keyCodes[pos%len(key)] -= ascii_a
+			code = (code+keyCodes[pos%len(key)])%englishAlphabetLength + ascii_a
 
 			//	Reverting transformed characters from case handling
 			if folded {
 				code = int(unicode.ToUpper(rune(code)))
 			}
 
-			outputs[0] += string(rune(code + ascii_a))
+			outputs[0] += string(rune(code))
 		}
 	case "decrypt":
-		fmt.Println(message, key)
+		for pos, code := range toAscii(message) {
+			//	Case Handling
+			var folded bool
+			if unicode.IsUpper(rune(code)) {
+				code = int(unicode.ToLower(rune(code)))
+				folded = true
+			}
+
+			code -= ascii_a
+			keyCodes[pos%len(key)] -= ascii_a
+			code = (code-keyCodes[pos%len(key)]+englishAlphabetLength)%englishAlphabetLength + ascii_a
+
+			//	Reverting transformed characters from case handling
+			if folded {
+				code = int(unicode.ToUpper(rune(code)))
+			}
+
+			outputs[0] += string(rune(code))
+		}
 	}
 	fmt.Println("The message is among the following:")
 	printOutputs(outputs)
-}
-
-func main() {
-	// configure commando
-	commando.
-		SetExecutableName("cipher").
-		SetVersion("1.0.0").
-		SetDescription("This CLI application allows one to encrypt and decrypt messages.")
-
-	// configure the atbash command
-	commando.
-		Register("atbash").
-		AddArgument("message", "message to encrypt/decrypt", "").
-		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-		SetAction(atbashCipher)
-
-	// configure the shift command
-	commando.
-		Register("shift").
-		AddArgument("message", "message to encrypt/decrypt", "").
-		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-		AddFlag("key,k", "shift key", commando.Int, 0).
-		SetAction(shiftCipher)
-
-	// configure the shift command
-	commando.
-		Register("vigenere").
-		AddArgument("message", "message to encrypt/decrypt", "").
-		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-		AddFlag("key,k", "shift key", commando.String, "a").
-		SetAction(vigenereCipher)
-
-	//// configure the shift command
-	//commando.
-	//	Register("rail").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.Int, 0).
-	//	SetAction(railFenceCipher)
-	//
-	//// configure the shift command
-	//commando.
-	//	Register("rsa").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.Int, 0).
-	//	SetAction(RSACipher)
-
-	// parse command-line arguments
-	commando.Parse(nil)
 }
