@@ -53,7 +53,6 @@ func hasWord(str string) bool {
 	for _, field := range strings.Fields(str) {
 		for _, word := range words {
 			if strings.ToLower(field) == word {
-				fmt.Println(field)
 				return true
 			}
 		}
@@ -156,7 +155,7 @@ func _shift(message string, shiftKey int) string {
 	return output
 }
 
-// shift cipher callback
+//	Shift cipher callback
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	// copies of arguments
 	message := args["message"].Value
@@ -195,6 +194,21 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 	printOutputs(possibleOutputs)
 }
 
+//	Vigenere Cipher
+func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	message := args["message"].Value
+	key, _ := flags["key"].GetString()
+	key = strings.ToLower(key)
+
+	var outputs []string
+	switch flags["process"].Value {
+	case "encrypt":
+		fmt.Println(message, key, outputs)
+	}
+
+	printOutputs(outputs)
+}
+
 func main() {
 	// configure commando
 	commando.
@@ -216,14 +230,14 @@ func main() {
 		AddFlag("key,k", "shift key", commando.Int, 0).
 		SetAction(shiftCipher)
 
-	//// configure the shift command
-	//commando.
-	//	Register("vigenere").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.String, "A").
-	//	SetAction(vigenereCipher)
-	//
+	// configure the shift command
+	commando.
+		Register("vigenere").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("key,k", "shift key", commando.String, "a").
+		SetAction(vigenereCipher)
+
 	//// configure the shift command
 	//commando.
 	//	Register("rail").
