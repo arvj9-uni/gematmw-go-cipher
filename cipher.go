@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	mostCommonWords           = "Z:\\GitHub\\gematmw-go-cipher\\resources\\20k.txt"
+	mostCommonWords           = "Z:\\GitHub\\gematmw-go-cipher\\resources\\20k-edited.txt"
 	englishAlphabetLength     = 26
 	ascii_a               int = 'a'
 	ascii_z               int = 'z'
@@ -92,7 +92,7 @@ func toAscii(plaintext string) (asciiStream []int) {
 //	its reverse such that the first letter becomes the last
 //	letter, the second letter becomes the second to the last
 //	letter, and so on.
-func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
+func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	// copies of arguments
 	message := args["message"].Value
 
@@ -117,6 +117,12 @@ func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagV
 		output[0] += string(rune(code))
 	}
 
+	switch flags["process"].Value {
+	case "encrypt":
+		fmt.Println("The encrypted message is:")
+	case "decrypt":
+		fmt.Println("The decrypted message:")
+	}
 	fmt.Println("The message is now:")
 	printOutputs(output)
 }
@@ -127,7 +133,7 @@ func _shift(message string, shiftKey int) string {
 	var output string
 	var shiftedCode int
 	for _, code := range toAscii(message) {
-		// Handles uppercase lowercase situations
+		//	Case handling
 		var folded bool
 		if unicode.IsUpper(rune(code)) {
 			code = int(unicode.ToLower(rune(code)))
@@ -136,7 +142,7 @@ func _shift(message string, shiftKey int) string {
 
 		shiftedCode = code + shiftKey
 
-		// Control flow for non alphabet characters
+		//	Control flow for non alphabet characters
 		if !unicode.IsLetter(rune(code)) {
 			shiftedCode = code
 		} else if shiftedCode < ascii_a {
@@ -145,7 +151,7 @@ func _shift(message string, shiftKey int) string {
 			shiftedCode = ascii_a - (ascii_z - shiftedCode + 1)
 		}
 
-		// reverts character case if changed
+		//	reverts character case if changed
 		if folded {
 			shiftedCode = int(unicode.ToUpper(rune(shiftedCode)))
 		}
@@ -157,22 +163,22 @@ func _shift(message string, shiftKey int) string {
 
 //	Shift cipher callback
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-	// copies of arguments
+	//	copies of arguments
 	message := args["message"].Value
 	shiftKey, _ := flags["key"].GetInt()
 
-	// init setup for loop
+	//	init setup for loop
 	directions := [2]int{-1, 1}
 	var possibleOutputs []string
 
-	// encryption and decryption handling
+	//	encryption and decryption handling
 	switch flags["process"].Value {
 	case "encrypt":
 		for _, dir := range directions {
 			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
 		}
 	case "decrypt":
-		// missing shift key
+		//	missing shift key
 		if shiftKey == 0 {
 			for shift := 1; shift <= 25; shift++ {
 				possibleOutputs = append(possibleOutputs, _shift(message, shift))
@@ -182,7 +188,7 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 			break
 		}
 
-		// when shift key is provided
+		//	when shift key is provided
 		for _, dir := range directions {
 			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
 		}
@@ -194,18 +200,51 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 	printOutputs(possibleOutputs)
 }
 
+//	Vigenère cipher helper function that repeats the key to
+//	the lenght of the message.
+func fillRepeat(key string, fillLength int) string {
+	for i := 0; i < fillLength/len(key); i++ {
+		key += key
+	}
+	key += key[:fillLength%len(key)]
+	return key
+}
+
 //	Vigenere Cipher
 func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
-	key, _ := flags["key"].GetString()
-	key = strings.ToLower(key)
 
-	var outputs []string
+	//	Key setup for vigenère cipher
+	key, _ := flags["key"].GetString()
+	key = fillRepeat(strings.ToLower(key), len(message))
+	keyCodes := toAscii(key)
+
+	outputs := []string{""}
 	switch flags["process"].Value {
 	case "encrypt":
-		fmt.Println(message, key, outputs)
-	}
+		for pos, code := range toAscii(message) {
+			//	Case handling
+			var folded bool
+			if unicode.IsUpper(rune(code)) {
+				code = int(unicode.ToLower(rune(code)))
+				folded = true
+			}
 
+			code -= ascii_a
+			keyCodes[pos] -= ascii_a
+			code = (code + keyCodes[pos]) % englishAlphabetLength
+
+			//	Reverting transformed characters from case handling
+			if folded {
+				code = int(unicode.ToUpper(rune(code)))
+			}
+
+			outputs[0] += string(rune(code + ascii_a))
+		}
+	case "decrypt":
+		fmt.Println(message, key)
+	}
+	fmt.Println("The message is among the following:")
 	printOutputs(outputs)
 }
 
@@ -220,6 +259,7 @@ func main() {
 	commando.
 		Register("atbash").
 		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
 		SetAction(atbashCipher)
 
 	// configure the shift command
