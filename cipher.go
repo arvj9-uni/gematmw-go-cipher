@@ -6,16 +6,12 @@ decrypts messages using different cipher methods.
 package main
 
 import (
-	//	Builtin Packages
 	"bufio"
 	"fmt"
+	"github.com/thatisuday/commando"
 	"os"
 	"strings"
 	"unicode"
-	//	Custom Packages
-
-	//	External Packages
-	"github.com/thatisuday/commando"
 )
 
 const (
@@ -55,21 +51,21 @@ func main() {
 		AddFlag("key,k", "shift key", commando.String, "a").
 		SetAction(vigenereCipher)
 
-	//// configure the shift command
-	//commando.
-	//	Register("rail").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.Int, 0).
-	//	SetAction(railFenceCipher)
-	//
-	//// configure the shift command
-	//commando.
-	//	Register("rsa").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.Int, 0).
-	//	SetAction(RSACipher)
+	// configure the shift command
+	commando.
+		Register("rail").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("key,k", "shift key", commando.Int, 0).
+		SetAction(railFenceCipher)
+
+	// configure the shift command
+	commando.
+		Register("rsa").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("key,k", "shift key", commando.Int, 0).
+		SetAction(RSACipher)
 
 	// parse command-line arguments
 	commando.Parse(nil)
@@ -96,6 +92,8 @@ func scanLines(path string) ([]string, error) {
 	return lines, nil
 }
 
+//	hasWord returns whether a string has a valid word from the
+//	wordlist provided.
 func hasWord(str string) bool {
 	words, err := scanLines(mostCommonWords)
 	if err != nil {
@@ -132,7 +130,7 @@ func printOutputs(outputs []string) {
 	}
 }
 
-//	Transforms a string to an array of each character's ASCII
+//	toAscii transforms a string to an array of each character's ASCII
 //	value.
 func toAscii(plaintext string) (asciiStream []int) {
 	asciiStream = make([]int, len(plaintext))
@@ -142,7 +140,7 @@ func toAscii(plaintext string) (asciiStream []int) {
 	return
 }
 
-//	The atbash cipher maps each character of an alphabet to
+//	The atbashCipher maps each character of an alphabet to
 //	its reverse such that the first letter becomes the last
 //	letter, the second letter becomes the second to the last
 //	letter, and so on.
@@ -181,8 +179,8 @@ func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 	printOutputs(output)
 }
 
-//	The shift cipher maps each character to the nth character
-//	from the original character.
+//	_shift is a helper function that does the actual mapping
+//	of characters.
 func _shift(message string, shiftKey int) string {
 	var output string
 	var shiftedCode int
@@ -215,7 +213,8 @@ func _shift(message string, shiftKey int) string {
 	return output
 }
 
-//	Shift cipher callback
+//	shiftCipher is the callback function for the shift cipher
+//	command. It handles the encryption and  the decryption
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	//	copies of arguments
 	message := args["message"].Value
@@ -254,52 +253,67 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 	printOutputs(possibleOutputs)
 }
 
-//	Vigenere Cipher
+//	vigenereCipher is the callback function for the Vigenère
+//	cipher command.
 func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
 
 	//	Key setup for vigenère cipher
 	key, _ := flags["key"].GetString()
-	keyCodes := toAscii(key)
+	keyCodes := toAscii(strings.ToLower(key))
 
 	outputs := []string{""}
+	var isAlpha bool
+	var isUpper bool
 	switch flags["process"].Value {
 	case "encrypt":
 		for pos, code := range toAscii(message) {
+			//	Non-Alpha Character Handling
+			isAlpha = unicode.IsLetter(rune(code))
+
 			//	Case handling
-			var folded bool
-			if unicode.IsUpper(rune(code)) {
+			isUpper = unicode.IsUpper(rune(code))
+			if isUpper && isAlpha {
 				code = int(unicode.ToLower(rune(code)))
-				folded = true
 			}
 
-			code -= ascii_a
-			keyCodes[pos%len(key)] -= ascii_a
-			code = (code+keyCodes[pos%len(key)])%englishAlphabetLength + ascii_a
+			//	Encryption
+			if isAlpha {
+				code -= ascii_a
+				keyCodes[pos%len(key)] -= ascii_a
+				code = (code+keyCodes[pos%len(key)])%englishAlphabetLength + ascii_a
+			}
 
 			//	Reverting transformed characters from case handling
-			if folded {
+			if isUpper {
 				code = int(unicode.ToUpper(rune(code)))
+				isUpper = false
 			}
 
 			outputs[0] += string(rune(code))
 		}
 	case "decrypt":
 		for pos, code := range toAscii(message) {
+			//	Non-Alphabet Character Handling
+			isAlpha = unicode.IsLetter(rune(code))
+
 			//	Case Handling
-			var folded bool
-			if unicode.IsUpper(rune(code)) {
+			isUpper = unicode.IsUpper(rune(code))
+			if isUpper && isAlpha {
 				code = int(unicode.ToLower(rune(code)))
-				folded = true
 			}
 
-			code -= ascii_a
-			keyCodes[pos%len(key)] -= ascii_a
-			code = (code-keyCodes[pos%len(key)]+englishAlphabetLength)%englishAlphabetLength + ascii_a
+			//	Decryption
+			if isAlpha {
+				code -= ascii_a
+				keyCodes[pos%len(key)] -= ascii_a
+				code = (code-keyCodes[pos%len(key)])%englishAlphabetLength + ascii_a
+			}
 
 			//	Reverting transformed characters from case handling
-			if folded {
+			if isUpper {
 				code = int(unicode.ToUpper(rune(code)))
+				isUpper = false
 			}
 
 			outputs[0] += string(rune(code))
@@ -307,4 +321,12 @@ func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando
 	}
 	fmt.Println("The message is among the following:")
 	printOutputs(outputs)
+}
+
+func railFenceCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	fmt.Println(args, flags)
+}
+
+func RSACipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	fmt.Println(args, flags)
 }
