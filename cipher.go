@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/thatisuday/commando"
 )
 
@@ -51,12 +52,22 @@ func main() {
 		SetAction(rsaCipher)
 }
 
-func atbashCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
+//	The callback function, atbashCipher, maps each character to
+//	the reverse in the english alphabet.
+func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
+	var message string = args["message"].Value
+	fmt.Println(message)
+}
 
+//	The callback function, shiftCipher, maps each character to
+//	n-steps in the english alphabet.
 func shiftCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
 
+//	The callback function, vigenereCipher, maps
 func vigenereCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
 
+//	The callback function, railFenceCipher,
 func railFenceCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
 
+//	The callback function, rsaCipher,
 func rsaCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
