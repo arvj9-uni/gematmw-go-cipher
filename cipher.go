@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	mostCommonWords       string = "Z:\\GitHub\\gematmw-go-cipher\\resources\\20k-edited.txt"
+	mostCommonWords       string = "Z:\\GitHub\\gematmw-go-cipher\\assets\\20k-edited.txt"
 	englishAlphabetLength int    = 26
 	ascii_a               int    = 'a'
 	ascii_z               int    = 'z'
