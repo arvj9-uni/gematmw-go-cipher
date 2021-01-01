@@ -3,6 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/thatisuday/commando"
+	"strconv"
+)
+
+const (
+	//	ASCII codes needed for calculations
+	asciiA int = 'A'
+	asciiZ int = 'Z'
 )
 
 func main() {
@@ -50,6 +57,9 @@ func main() {
 		AddFlag("public,e", "RSA cipher public key", commando.Int, 0).
 		AddFlag("private,d", "RSA cipher private key", commando.Int, 0).
 		SetAction(rsaCipher)
+
+	//	parse command-line arguments
+	commando.Parse(nil)
 }
 
 //	The callback function, atbashCipher, maps each character to
