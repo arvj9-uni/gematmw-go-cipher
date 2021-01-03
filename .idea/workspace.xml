@@ -19,12 +19,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f0409f2d-fcfc-4523-a0b0-89cfd4dc962a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/assets/20k-edited" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cipher.go" beforeDir="false" afterPath="$PROJECT_DIR$/cipher.go" afterDir="false" />
-    </list>
+    <list default="true" id="f0409f2d-fcfc-4523-a0b0-89cfd4dc962a" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -219,7 +214,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609353274618</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="mapping">
+      <created>1609698609039</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1609698609039</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -250,7 +252,8 @@
     <MESSAGE value="Vigenere Decryption in-progress" />
     <MESSAGE value="Rewritten code" />
     <MESSAGE value="added comments" />
-    <option name="LAST_COMMIT_MESSAGE" value="added comments" />
+    <MESSAGE value="mapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="mapping" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -264,22 +267,22 @@
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1609523619940" />
-    <state width="914" height="280" key="GridCell.Tab.0.bottom" timestamp="1609597933270">
+    <state width="914" height="280" key="GridCell.Tab.0.bottom" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
-    <state width="914" height="280" key="GridCell.Tab.0.center" timestamp="1609597933270">
+    <state width="914" height="280" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
+    <state width="914" height="280" key="GridCell.Tab.0.center" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
-    <state width="914" height="280" key="GridCell.Tab.0.left" timestamp="1609597933270">
+    <state width="914" height="280" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
+    <state width="914" height="280" key="GridCell.Tab.0.left" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
-    <state width="914" height="280" key="GridCell.Tab.0.right" timestamp="1609597933270">
+    <state width="914" height="280" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
+    <state width="914" height="280" key="GridCell.Tab.0.right" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
+    <state width="914" height="280" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
     <state x="0" y="207" key="SettingsEditor" timestamp="1609527495222">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
