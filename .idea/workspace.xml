@@ -20,7 +20,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f0409f2d-fcfc-4523-a0b0-89cfd4dc962a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/assets/20k-edited" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cipher.go" beforeDir="false" afterPath="$PROJECT_DIR$/cipher.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -66,7 +68,7 @@
     <property name="node.js.path.for.package.tslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="settings.editor.selected.configurable" value="preferences.editor" />
+    <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Go" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -258,37 +260,37 @@
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="272" y="397" key="#Go_Modules/0.40.1920.1040@0.40.1920.1040" timestamp="1609052851394" />
-    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1609229703440">
+    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1609523619940">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1609229703440" />
-    <state width="914" height="280" key="GridCell.Tab.0.bottom" timestamp="1609521094761">
+    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1609523619940" />
+    <state width="914" height="280" key="GridCell.Tab.0.bottom" timestamp="1609597933270">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1609521094761" />
-    <state width="914" height="280" key="GridCell.Tab.0.center" timestamp="1609521094761">
+    <state width="914" height="280" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
+    <state width="914" height="280" key="GridCell.Tab.0.center" timestamp="1609597933270">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1609521094761" />
-    <state width="914" height="280" key="GridCell.Tab.0.left" timestamp="1609521094761">
+    <state width="914" height="280" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
+    <state width="914" height="280" key="GridCell.Tab.0.left" timestamp="1609597933270">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1609521094761" />
-    <state width="914" height="280" key="GridCell.Tab.0.right" timestamp="1609521094761">
+    <state width="914" height="280" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
+    <state width="914" height="280" key="GridCell.Tab.0.right" timestamp="1609597933270">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1609521094761" />
-    <state x="0" y="207" key="SettingsEditor" timestamp="1609170829303">
+    <state width="914" height="280" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1609597933270" />
+    <state x="0" y="207" key="SettingsEditor" timestamp="1609527495222">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="0" y="207" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1609170829303" />
+    <state x="0" y="207" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1609527495222" />
     <state x="953" y="40" width="974" height="1047" key="dock-window-1" timestamp="1609255547077">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="953" y="40" width="974" height="1047" key="dock-window-1/0.40.1920.1040@0.40.1920.1040" timestamp="1609255547077" />
-    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup" timestamp="1609174992165">
+    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup" timestamp="1609597133341">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup/0.40.1920.1040@0.40.1920.1040" timestamp="1609174992165" />
+    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup/0.40.1920.1040@0.40.1920.1040" timestamp="1609597133341" />
   </component>
 </project>
