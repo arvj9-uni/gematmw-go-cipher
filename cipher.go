@@ -127,6 +127,7 @@ func filterGibberish(possibleOutputs []string) []string {
 	var outputs []string
 	for _, possibleOutputs := range possibleOutputs {
 		if hasWord(possibleOutputs) {
+			fmt.Println("he")
 			outputs = append(outputs, possibleOutputs)
 		}
 	}
@@ -142,7 +143,7 @@ func printOutput(message interface{}) {
 	case []string:
 		fmt.Println("The possible message is among these:")
 		for _, possibleOutput := range t {
-			fmt.Printf("\t%v", possibleOutput)
+			fmt.Printf("\t%v\n", possibleOutput)
 		}
 	}
 }
@@ -180,11 +181,11 @@ func affine(char rune, a int, b int) rune {
 	return char
 }
 
-//	Map returns a copy of the string s with all its characters
+//	affineMap returns a copy of the string s with all its characters
 //	modified according to the mapping function. This is a
 //	modified version of the Map function found in the strings
 //	package.
-func Map(mapping func(rune, int, int) rune, coefficients []int, s string) string {
+func affineMap(mapping func(rune, int, int) rune, coefficients []int, s string) string {
 	//	The output buffer acc is initialized on demand, the
 	//	first time a character differs.
 	var acc strings.Builder
@@ -250,7 +251,7 @@ func affineCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 
 	switch flags["process"].Value {
 	case "encrypt":
-		message = Map(affine, coefficients, message)
+		message = affineMap(affine, coefficients, message)
 	case "decrypt":
 		break
 	}
@@ -270,9 +271,9 @@ func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 
 	switch flags["process"].Value {
 	case "encrypt":
-		message = Map(affine, coefficients, message)
+		message = affineMap(affine, coefficients, message)
 	case "decrypt":
-		message = Map(affine, coefficients, message)
+		message = affineMap(affine, coefficients, message)
 	}
 
 	printOutput(message)
@@ -288,40 +289,115 @@ func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
 	key, _ := flags["key"].GetInt()
-	coefficients := []int{0, key} //	y =  (key) mod 26
+	coefficients := []int{1, key} //	y =  (x + key) mod 26
 
+	directions := []int{-1, 1}
 	var possibleOutputs []string
 	switch flags["process"].Value {
 	case "encrypt":
-		possibleOutputs = append(possibleOutputs, Map(affine, coefficients, message))
+		for _, dir := range directions {
+			coefficients[1] = dir * key
+			possibleOutputs = append(possibleOutputs, affineMap(affine, coefficients, message))
+		}
 	case "decrypt":
 		//	missing shift key
 		if key == 0 {
 			for shift := 1; shift <= 25; shift++ {
-				coefficients = []int{0, shift}
-				possibleOutputs = append(possibleOutputs, Map(affine, coefficients, message))
+				coefficients[1] = shift * key
+				possibleOutputs = append(possibleOutputs, affineMap(affine, coefficients, message))
 			}
 			possibleOutputs = filterGibberish(possibleOutputs)
 			break
 		}
 
-		directions := []int{-1, 1}
 		for _, dir := range directions {
 			//	when shift key is provided
-			coefficients = []int{0, key * dir}
-			possibleOutputs = append(possibleOutputs, Map(affine, coefficients, message))
+			coefficients[1] = dir * key
+			possibleOutputs = append(possibleOutputs, affineMap(affine, coefficients, message))
 		}
-		possibleOutputs = filterGibberish(possibleOutputs)
+		//possibleOutputs = filterGibberish(possibleOutputs)
 	}
 
 	printOutput(possibleOutputs)
 }
 
+//	vigenereMap returns a copy of the string s with all its characters
+//	modified according to the mapping function. This is a
+//	modified version of the Map function found in the strings
+//	package.
+func vigenereMap(mapping func(rune, int, int) rune, key string, s string) string {
+	//	The output buffer acc is initialized on demand, the
+	//	first time a character differs.
+	var acc strings.Builder
+	var charShift int
+	for i, char := range s {
+		charShift = int(key[i%len(key)])
+		r := mapping(char, 1, charShift)
+		if r == char && char != utf8.RuneError {
+			continue
+		}
+
+		var width int
+		if char == utf8.RuneError {
+			char, width = utf8.DecodeRuneInString(s[i:])
+			if width != 1 && r == char {
+				continue
+			}
+		} else {
+			width = utf8.RuneLen(char)
+		}
+
+		acc.Grow(len(s) + utf8.UTFMax)
+		acc.WriteString(s[:i])
+		if r >= 0 {
+			acc.WriteRune(r)
+		}
+
+		s = s[i+width:]
+		break
+	}
+
+	//	Fast path for unchanged input
+	if acc.Cap() == 0 {
+		return s
+	}
+
+	for i, char := range s {
+		charShift = int(key[i%len(key)])
+		r := mapping(char, 1, charShift)
+
+		if r >= 0 {
+			//	common case
+			//	Due to inlining, it is more performant to
+			//	determine if WriteByte should be invoked rather
+			//	than always call WriteRune
+			if r < utf8.RuneSelf {
+				acc.WriteByte(byte(r))
+			} else {
+				//	r is not an ASCII rune.
+				acc.WriteRune(r)
+			}
+		}
+	}
+	return acc.String()
+}
+
 //	The callback function, vigenereCipher, maps each alphabet
 //	letter according to a string key which maps each character
 //	differently compared to the regular shift cipher.
-func vigenereCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
+func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	message := args["message"].Value
+	key, _ := flags["key"].GetString()
+	key = strings.ToLower(key)
 
+	var possibleOutputs []string
+	switch flags["message"].Value {
+	case "encrypt":
+		possibleOutputs = append(possibleOutputs, vigenereMap(affine, key, message))
+	case "decrypt":
+		possibleOutputs = append(possibleOutputs, vigenereMap(affine, key, message))
+	}
+	printOutput(possibleOutputs)
 }
 
 //	The callback function, railFenceCipher,
