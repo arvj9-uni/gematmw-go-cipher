@@ -6,21 +6,17 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
-	_ "unicode"
 	"unicode/utf8"
 )
 
 const (
 	//	File Directories
-	commonWords string = "Z:\\GitHub\\gematmw-go-cipher\\assets\\20k-edited"
+	commonWords string = "Z:\\GitHub\\gematmw-go-cipher\\assets\\20k-edited-1k.txt"
 
 	//	ASCII codes needed for calculations
 	asciiA int = 'A'
-	asciiZ int = 'Z'
 
 	englishAlphabetLen int = 26
-	base10             int = 10
-	bit32              int = 32
 )
 
 func main() {
