@@ -28,7 +28,7 @@ func main() {
 	commando.
 		SetExecutableName("cipher").
 		SetVersion("2.0.0").
-		SetDescription("This is a CLI application that encrypts/decrypts messages using different methods that may or may not have been discussed in class.")
+		SetDescription("This is a CLI application that encrypts/decrypts messages using different methods that may or may not have been discussed in class. The interface is based on the commando package in https://github.com/thatisuday/commando")
 
 	//	configure the affine command
 	commando.
@@ -208,10 +208,14 @@ func affineCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 }
 
 //	The callback function, atbashCipher, maps each alphabet
-//	letter to the reverse in the english alphabet.
+//	letter to the reverse in the english alphabet. The affine
+//	cipher system is used as a helper for this cipher as they
+//	relate to each other via the equation: E(x) = (-x + 25) mod26,
+//	which is achieved when plotting the (input, output) of the
+//	atbashCipher and determining the linear equation for it.
 func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
-	coefs := []int{-1, 25}				//	y = -x + 25
+	coefs := []int{-1, 25}				//	y = (-x + 25) mod26
 
 	switch flags["process"].Value {
 	case "encrypt":
@@ -224,11 +228,16 @@ func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 }
 
 //	The callback function, shiftCipher, maps each alphabet
-//	letter to n-steps in the english alphabet.
+//	letter to n-steps in the english alphabet. The affine
+//	cipher system is used as a helper for this cipher as they
+//	relate to each other via the equation: E(x) = (key) mod26,
+//	which mean that the second coefficient is the vertical
+//	shift component of the function while the first can be seen
+//	as the "period" likened to sine waves.
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
 	key, _ := flags["key"].GetInt()
-	coefs := []int{0, key}
+	coefs := []int{0, key}	//	y =  (key) mod 26
 
 	switch flags["process"].Value {
 	case "encrypt":
