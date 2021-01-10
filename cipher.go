@@ -16,11 +16,8 @@ const (
 
 	//	ASCII codes needed for calculations
 	asciiA int = 'A'
-	asciiZ int = 'Z'
 
 	englishAlphabetLen int = 26
-	base10             int = 10
-	bit32              int = 32
 )
 
 func main() {
