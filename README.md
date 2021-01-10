@@ -9,4 +9,4 @@ encrypt and decrypt messages.
 
 # References
 - [Most Common English Words](https://github.com/first20hours/google-10000-english)
-- [Atbash Cipher Encryption/Decryption Function](https://en.wikipedia.org/wiki/Atbash#Relationship_to_the_affine_cipher)
+- [Affine Ciphers, Decimation Ciphers, and Modular Arithmetic](http://pi.math.cornell.edu/~kozdron/Teaching/Cornell/135Summer06/Handouts/affine.pdf)

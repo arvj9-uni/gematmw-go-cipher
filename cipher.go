@@ -1,310 +1,261 @@
-/*
-Package gematmw-go-cipher is a CLI tool that encrypts and
-decrypts messages using different cipher methods.
-*/
-
 package main
 
 import (
-	//	Builtin Packages
-	"bufio"
 	"fmt"
-	"os"
+	"github.com/thatisuday/commando"
+	"strconv"
 	"strings"
 	"unicode"
-	//	Custom Packages
-
-	//	External Packages
-	"github.com/thatisuday/commando"
+	_ "unicode"
+	"unicode/utf8"
 )
 
 const (
-	mostCommonWords       string = "Z:\\GitHub\\gematmw-go-cipher\\resources\\20k-edited.txt"
-	englishAlphabetLength int    = 26
-	ascii_a               int    = 'a'
-	ascii_z               int    = 'z'
+	//	File Directories
+	commonWords string = "Z:\\GitHub\\gematmw-go-cipher\\assets\\20k-edited"
+
+	//	ASCII codes needed for calculations
+	asciiA int = 'A'
+	asciiZ int = 'Z'
+
+	englishAlphabetLen int = 26
+	base10             int = 10
+	bit32              int = 32
 )
 
 func main() {
-	// configure commando
+	//	configure commando
 	commando.
 		SetExecutableName("cipher").
-		SetVersion("1.0.0").
-		SetDescription("This CLI application allows one to encrypt and decrypt messages.")
+		SetVersion("2.0.0").
+		SetDescription("This is a CLI application that encrypts/decrypts messages using different methods that may or may not have been discussed in class. The interface is based on the commando package in https://github.com/thatisuday/commando")
 
-	// configure the atbash command
+	//	configure the affine command
+	commando.
+		Register("affine").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("key,k", "values for a and b for the function input as 'a,b'", commando.String, "1,0").
+		SetAction(affineCipher)
+
+	//	configure the atbash command
 	commando.
 		Register("atbash").
 		AddArgument("message", "message to encrypt/decrypt", "").
 		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
 		SetAction(atbashCipher)
 
-	// configure the shift command
+	//	configure the shift command
 	commando.
 		Register("shift").
 		AddArgument("message", "message to encrypt/decrypt", "").
 		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-		AddFlag("key,k", "shift key", commando.Int, 0).
+		AddFlag("key,k", "cipher shift key", commando.Int, 0).
 		SetAction(shiftCipher)
 
-	// configure the shift command
+	//	configure the vigenère command
 	commando.
 		Register("vigenere").
 		AddArgument("message", "message to encrypt/decrypt", "").
 		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-		AddFlag("key,k", "shift key", commando.String, "a").
+		AddFlag("key,k", "cipher key", commando.String, "a").
 		SetAction(vigenereCipher)
 
-	//// configure the shift command
-	//commando.
-	//	Register("rail").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.Int, 0).
-	//	SetAction(railFenceCipher)
-	//
-	//// configure the shift command
-	//commando.
-	//	Register("rsa").
-	//	AddArgument("message", "message to encrypt/decrypt", "").
-	//	AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
-	//	AddFlag("key,k", "shift key", commando.Int, 0).
-	//	SetAction(RSACipher)
+	//	configure the rail fence command
+	commando.
+		Register("rail").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("key,k", "rail fence cipher key", commando.Int, 0).
+		SetAction(railFenceCipher)
 
-	// parse command-line arguments
+	//	configure the RSA cryptosystem command
+	commando.
+		Register("rsa").
+		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
+		AddFlag("public,e", "RSA cipher public key", commando.Int, 0).
+		AddFlag("private,d", "RSA cipher private key", commando.Int, 0).
+		SetAction(rsaCipher)
+
+	//	parse command-line arguments
 	commando.Parse(nil)
 }
 
-//	The scanLines function scans a text file line-by-line and
-//	returns each line in a string slice.
-func scanLines(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err = file.Close(); err != nil {
-			panic(err)
+//	printOutput displays the format for the cipher output.
+func printOutput(message interface{}) {
+	switch t := message.(type) {
+	case string:
+		fmt.Println("The transformed message is:")
+		fmt.Printf("\t%v", t)
+	case []string:
+		fmt.Println("The possible message is among these:")
+		for _, possibleOutput := range t {
+			fmt.Printf("\t%v", possibleOutput)
 		}
-	}()
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanLines)
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, nil
-}
-
-func hasWord(str string) bool {
-	words, err := scanLines(mostCommonWords)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, field := range strings.Fields(str) {
-		for _, word := range words {
-			if strings.ToLower(field) == word {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-//	filterGibberish removes items from possible outputs that
-//	do not contain any english word using the chosen wordlist.
-func filterGibberish(possibleOutputs []string) []string {
-	var outputs []string
-	for _, possibleOutput := range possibleOutputs {
-		if hasWord(possibleOutput) {
-			outputs = append(outputs, possibleOutput)
-		}
-	}
-	return outputs
-}
-
-//	printOutputs displays the possible outputs in separate
-//	indented lines.
-func printOutputs(outputs []string) {
-	for _, word := range outputs {
-		fmt.Printf("\t%v\n", word)
 	}
 }
 
-//	Transforms a string to an array of each character's ASCII
-//	value.
-func toAscii(plaintext string) (asciiStream []int) {
-	asciiStream = make([]int, len(plaintext))
-	for pos := 0; pos < len(asciiStream); pos++ {
-		asciiStream[pos] = int(plaintext[pos])
-	}
-	return
-}
-
-//	The atbash cipher maps each character of an alphabet to
-//	its reverse such that the first letter becomes the last
-//	letter, the second letter becomes the second to the last
-//	letter, and so on.
-func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-	// copies of arguments
-	message := args["message"].Value
-
-	output := []string{""}
-	for _, code := range toAscii(message) {
-		// Handles uppercase lowercase situations
-		var folded bool
-		if unicode.IsLower(rune(code)) {
-			code = int(unicode.ToUpper(rune(code)))
-			folded = true
-		}
-
-		// [Atbash Cipher Encryption/Decryption Function](https://en.wikipedia.org/wiki/Atbash#Relationship_to_the_affine_cipher)
-		code -= ascii_a
-		code = (englishAlphabetLength - 1) * (code + 1) % englishAlphabetLength
-		code += ascii_a
-
-		// Reverts character case if folded
-		if folded {
-			code = int(unicode.ToLower(rune(code)))
-		}
-		output[0] += string(rune(code))
-	}
-
-	switch flags["process"].Value {
-	case "encrypt":
-		fmt.Println("The encrypted message is:")
-	case "decrypt":
-		fmt.Println("The decrypted message:")
-	}
-	fmt.Println("The message is now:")
-	printOutputs(output)
-}
-
-//	The shift cipher maps each character to the nth character
-//	from the original character.
-func _shift(message string, shiftKey int) string {
-	var output string
-	var shiftedCode int
-	for _, code := range toAscii(message) {
-		//	Case handling
-		var folded bool
-		if unicode.IsUpper(rune(code)) {
-			code = int(unicode.ToLower(rune(code)))
-			folded = true
-		}
-
-		shiftedCode = code + shiftKey
-
-		//	Control flow for non alphabet characters
-		if !unicode.IsLetter(rune(code)) {
-			shiftedCode = code
-		} else if shiftedCode < ascii_a {
-			shiftedCode = ascii_z - (ascii_a - shiftedCode - 1)
-		} else if shiftedCode > ascii_z {
-			shiftedCode = ascii_a - (ascii_z - shiftedCode + 1)
-		}
-
-		//	reverts character case if changed
-		if folded {
-			shiftedCode = int(unicode.ToUpper(rune(shiftedCode)))
-		}
-
-		output += string(rune(shiftedCode))
+//	parseInput takes the comma separated arguments of key flags
+//	as needed.
+func parseInput(input string) []int {
+	output := make([]int, strings.Count(input, ",")+1)
+	for i, coeff := range strings.Split(input, ",") {
+		output[i], _ = strconv.Atoi(coeff)
 	}
 	return output
 }
 
-//	Shift cipher callback
+//	This affine function is a helper that may be used by
+//	similar ciphers.
+func affine(char rune, a int, b int) rune {
+	//	Non-alpha Handling
+	if isAlpha := unicode.IsLetter(char); isAlpha {
+		//	Case Handling
+		isUpper := unicode.IsUpper(char)
+		if !isUpper {
+			char = unicode.ToUpper(char)
+		}
+
+		mapped := int(char) - asciiA
+		mapped = (a*mapped + b) % englishAlphabetLen
+		char = rune(mapped + asciiA)
+
+		if !isUpper {
+			char = unicode.ToLower(char)
+		}
+	}
+
+	return char
+}
+
+//	Map returns a copy of the string s with all its characters
+//	modified according to the mapping function. This is a
+//	modified version of the Map function found in the strings
+//	package.
+func Map(mapping func(rune, int, int) rune, coefs []int, s string) string {
+	//	The output buffer acc is initialized on demand, the
+	//	first time a character differs.
+	var acc strings.Builder
+	for i, char := range s {
+		r := mapping(char, coefs[0], coefs[1])
+		if r == char && char != utf8.RuneError {
+			continue
+		}
+
+		var width int
+		if char == utf8.RuneError {
+			char, width = utf8.DecodeRuneInString(s[i:])
+			if width != 1 && r == char {
+				continue
+			}
+		} else {
+			width = utf8.RuneLen(char)
+		}
+
+		acc.Grow(len(s) + utf8.UTFMax)
+		acc.WriteString(s[:i])
+		if r >= 0 {
+			acc.WriteRune(r)
+		}
+
+		s = s[i+width:]
+		break
+	}
+
+	//	Fast path for unchanged input
+	if acc.Cap() == 0 {
+		return s
+	}
+
+	for _, char := range s {
+		r := mapping(char, coefs[0], coefs[1])
+
+		if r >= 0 {
+			//	common case
+			//	Due to inlining, it is more performant to
+			//	determine if WriteByte should be invoked rather
+			//	than always call WriteRune
+			if r < utf8.RuneSelf {
+				acc.WriteByte(byte(r))
+			} else {
+				//	r is not an ASCII rune.
+				acc.WriteRune(r)
+			}
+		}
+	}
+	return acc.String()
+}
+
+//	The callback function, affineCipher, maps each alphabet
+//	letter to a different letter according to an encryption
+//	function. E(x) = (a*x + b) % 26: this is done by the affine
+//	helper function.
+func affineCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	//	initial setup
+	message := args["message"].Value
+	input, _ := flags["key"].GetString()
+	coefs := parseInput(input)
+
+	switch flags["process"].Value {
+	case "encrypt":
+		message = Map(affine, coefs, message)
+	case "decrypt":
+		break
+	}
+
+	printOutput(message)
+}
+
+//	The callback function, atbashCipher, maps each alphabet
+//	letter to the reverse in the english alphabet. The affine
+//	cipher system is used as a helper for this cipher as they
+//	relate to each other via the equation: E(x) = (-x + 25) mod26,
+//	which is achieved when plotting the (input, output) of the
+//	atbashCipher and determining the linear equation for it.
+func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	message := args["message"].Value
+	coefs := []int{-1, 25}				//	y = (-x + 25) mod26
+
+	switch flags["process"].Value {
+	case "encrypt":
+		message = Map(affine, coefs, message)
+	case "decrypt":
+		message = Map(affine, coefs, message)
+	}
+
+	printOutput(message)
+}
+
+//	The callback function, shiftCipher, maps each alphabet
+//	letter to n-steps in the english alphabet. The affine
+//	cipher system is used as a helper for this cipher as they
+//	relate to each other via the equation: E(x) = (key) mod26,
+//	which mean that the second coefficient is the vertical
+//	shift component of the function while the first can be seen
+//	as the "period" likened to sine waves.
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-	//	copies of arguments
 	message := args["message"].Value
-	shiftKey, _ := flags["key"].GetInt()
+	key, _ := flags["key"].GetInt()
+	coefs := []int{0, key}	//	y =  (key) mod 26
 
-	//	init setup for loop
-	directions := [2]int{-1, 1}
-	var possibleOutputs []string
-
-	//	encryption and decryption handling
 	switch flags["process"].Value {
 	case "encrypt":
-		for _, dir := range directions {
-			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
-		}
+		message = Map(affine, coefs, message)
 	case "decrypt":
-		//	missing shift key
-		if shiftKey == 0 {
-			for shift := 1; shift <= 25; shift++ {
-				possibleOutputs = append(possibleOutputs, _shift(message, shift))
-			}
-
-			possibleOutputs = filterGibberish(possibleOutputs)
-			break
-		}
-
-		//	when shift key is provided
-		for _, dir := range directions {
-			possibleOutputs = append(possibleOutputs, _shift(message, dir*shiftKey))
-		}
-
-		possibleOutputs = filterGibberish(possibleOutputs)
+		message = Map(affine, coefs, message)
 	}
 
-	fmt.Println("The message is among the following:")
-	printOutputs(possibleOutputs)
+	printOutput(message)
 }
 
-//	Vigenere Cipher
-func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-	message := args["message"].Value
+//	The callback function, vigenereCipher, maps each alphabet
+//	letter according to a string key which maps each character
+//	differently compared to the regular shift cipher.
+func vigenereCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
 
-	//	Key setup for vigenère cipher
-	key, _ := flags["key"].GetString()
-	keyCodes := toAscii(key)
+//	The callback function, railFenceCipher,
+func railFenceCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
 
-	outputs := []string{""}
-	switch flags["process"].Value {
-	case "encrypt":
-		for pos, code := range toAscii(message) {
-			//	Case handling
-			var folded bool
-			if unicode.IsUpper(rune(code)) {
-				code = int(unicode.ToLower(rune(code)))
-				folded = true
-			}
-
-			code -= ascii_a
-			keyCodes[pos%len(key)] -= ascii_a
-			code = (code+keyCodes[pos%len(key)])%englishAlphabetLength + ascii_a
-
-			//	Reverting transformed characters from case handling
-			if folded {
-				code = int(unicode.ToUpper(rune(code)))
-			}
-
-			outputs[0] += string(rune(code))
-		}
-	case "decrypt":
-		for pos, code := range toAscii(message) {
-			//	Case Handling
-			var folded bool
-			if unicode.IsUpper(rune(code)) {
-				code = int(unicode.ToLower(rune(code)))
-				folded = true
-			}
-
-			code -= ascii_a
-			keyCodes[pos%len(key)] -= ascii_a
-			code = (code-keyCodes[pos%len(key)]+englishAlphabetLength)%englishAlphabetLength + ascii_a
-
-			//	Reverting transformed characters from case handling
-			if folded {
-				code = int(unicode.ToUpper(rune(code)))
-			}
-
-			outputs[0] += string(rune(code))
-		}
-	}
-	fmt.Println("The message is among the following:")
-	printOutputs(outputs)
-}
+//	The callback function, rsaCipher,
+func rsaCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}

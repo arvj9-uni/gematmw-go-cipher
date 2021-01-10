@@ -20,9 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f0409f2d-fcfc-4523-a0b0-89cfd4dc962a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/TODO.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cipher.go" beforeDir="false" afterPath="$PROJECT_DIR$/cipher.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -76,7 +74,7 @@
       <recent name="Z:\GitHub\gematmw-go-cipher\docs" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build scratch.go">
+  <component name="RunManager" selected="Go Build.go build github.com/arvj9-uni/gematmw-go-cipher">
     <configuration name="go build github.com/arvj9-uni/gematmw-go-cipher" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="gematmw-go-cipher" />
       <working_directory value="$PROJECT_DIR$" />
@@ -100,8 +98,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build scratch.go" />
         <item itemvalue="Go Build.go build github.com/arvj9-uni/gematmw-go-cipher" />
+        <item itemvalue="Go Build.go build scratch.go" />
       </list>
     </recent_temporary>
   </component>
@@ -198,7 +196,35 @@
       <option name="project" value="LOCAL" />
       <updated>1609222565650</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Vigenere Decryption in-progress">
+      <created>1609230880773</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1609230880773</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Rewritten code">
+      <created>1609325611808</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1609325611808</updated>
+    </task>
+    <task id="LOCAL-00015" summary="added comments">
+      <created>1609353274618</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1609353274618</updated>
+    </task>
+    <task id="LOCAL-00016" summary="mapping">
+      <created>1609698609039</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1609698609039</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -226,7 +252,11 @@
     <MESSAGE value="Revised gibberish handling" />
     <MESSAGE value="Vigenère cipher setup" />
     <MESSAGE value="Vigenère cipher encryption complete" />
-    <option name="LAST_COMMIT_MESSAGE" value="Vigenère cipher encryption complete" />
+    <MESSAGE value="Vigenere Decryption in-progress" />
+    <MESSAGE value="Rewritten code" />
+    <MESSAGE value="added comments" />
+    <MESSAGE value="mapping" />
+    <option name="LAST_COMMIT_MESSAGE" value="mapping" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -236,37 +266,37 @@
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
     <state x="272" y="397" key="#Go_Modules/0.40.1920.1040@0.40.1920.1040" timestamp="1609052851394" />
-    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1609229703440">
+    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1609523619940">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1609229703440" />
-    <state width="914" height="280" key="GridCell.Tab.0.bottom" timestamp="1609229883619">
+    <state x="225" y="362" key="#com.intellij.fileTypes.FileTypeChooser/0.40.1920.1040@0.40.1920.1040" timestamp="1609523619940" />
+    <state width="914" height="280" key="GridCell.Tab.0.bottom" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1609229883619" />
-    <state width="914" height="280" key="GridCell.Tab.0.center" timestamp="1609229883618">
+    <state width="914" height="280" key="GridCell.Tab.0.bottom/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
+    <state width="914" height="280" key="GridCell.Tab.0.center" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1609229883618" />
-    <state width="914" height="280" key="GridCell.Tab.0.left" timestamp="1609229883618">
+    <state width="914" height="280" key="GridCell.Tab.0.center/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
+    <state width="914" height="280" key="GridCell.Tab.0.left" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1609229883618" />
-    <state width="914" height="280" key="GridCell.Tab.0.right" timestamp="1609229883618">
+    <state width="914" height="280" key="GridCell.Tab.0.left/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
+    <state width="914" height="280" key="GridCell.Tab.0.right" timestamp="1609698612192">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state width="914" height="280" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1609229883618" />
-    <state x="0" y="207" key="SettingsEditor" timestamp="1609170829303">
+    <state width="914" height="280" key="GridCell.Tab.0.right/0.40.1920.1040@0.40.1920.1040" timestamp="1609698612192" />
+    <state x="0" y="207" key="SettingsEditor" timestamp="1610256990840">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="0" y="207" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1609170829303" />
-    <state x="953" y="40" width="974" height="1047" key="dock-window-1" timestamp="1609173703682">
+    <state x="0" y="207" key="SettingsEditor/0.40.1920.1040@0.40.1920.1040" timestamp="1610256990840" />
+    <state x="953" y="40" width="974" height="1047" key="dock-window-1" timestamp="1609255547077">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="953" y="40" width="974" height="1047" key="dock-window-1/0.40.1920.1040@0.40.1920.1040" timestamp="1609173703682" />
-    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup" timestamp="1609174992165">
+    <state x="953" y="40" width="974" height="1047" key="dock-window-1/0.40.1920.1040@0.40.1920.1040" timestamp="1609255547077" />
+    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup" timestamp="1609597133341">
       <screen x="0" y="40" width="1920" height="1040" />
     </state>
-    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup/0.40.1920.1040@0.40.1920.1040" timestamp="1609174992165" />
+    <state x="143" y="270" width="672" height="678" key="search.everywhere.popup/0.40.1920.1040@0.40.1920.1040" timestamp="1609597133341" />
   </component>
 </project>
