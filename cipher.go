@@ -24,7 +24,7 @@ const (
 func main() {
 	//	configure commando
 	commando.
-		SetExecutableName("cipher").
+		SetExecutableName("ciphers").
 		SetVersion("2.0.0").
 		SetDescription("This is a CLI application that encrypts/decrypts messages using different methods that may or may not have been discussed in class. The interface is based on the commando package in https://github.com/thatisuday/commando")
 
@@ -308,7 +308,7 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 		directions := []int{-1, 1}
 		for _, dir := range directions {
 			//	when shift key is provided
-			coefficients = []int{0, key*dir}
+			coefficients = []int{0, key * dir}
 			possibleOutputs = append(possibleOutputs, Map(affine, coefficients, message))
 		}
 		possibleOutputs = filterGibberish(possibleOutputs)
@@ -323,6 +323,7 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 func vigenereCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
 
 }
+
 //	The callback function, railFenceCipher,
 func railFenceCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
 
