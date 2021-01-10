@@ -42,6 +42,7 @@ func main() {
 	commando.
 		Register("atbash").
 		AddArgument("message", "message to encrypt/decrypt", "").
+		AddFlag("process,p", "encrypt/decrypt", commando.String, "encrypt").
 		SetAction(atbashCipher)
 
 	//	configure the shift command
@@ -108,19 +109,23 @@ func parseInput(input string) []int {
 //	This affine function is a helper that may be used by
 //	similar ciphers.
 func affine(char rune, a int, b int) rune {
-	//	Case Handling
-	isUpper := unicode.IsUpper(char)
-	if !isUpper {
-		unicode.ToUpper(char)
+	//	Non-alpha Handling
+	if isAlpha := unicode.IsLetter(char); isAlpha {
+		//	Case Handling
+		isUpper := unicode.IsUpper(char)
+		if !isUpper {
+			char = unicode.ToUpper(char)
+		}
+
+		mapped := int(char) - asciiA
+		mapped = (a*mapped + b) % englishAlphabetLen
+		char = rune(mapped + asciiA)
+
+		if !isUpper {
+			char = unicode.ToLower(char)
+		}
 	}
 
-	mapped := int(char) - asciiA
-	mapped = (a*mapped + b) % englishAlphabetLen
-	char = rune(mapped + asciiA)
-
-	if !isUpper {
-		unicode.ToLower(char)
-	}
 	return char
 }
 
@@ -204,14 +209,36 @@ func affineCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 
 //	The callback function, atbashCipher, maps each alphabet
 //	letter to the reverse in the english alphabet.
-func atbashCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
-	var message string = args["message"].Value
-	fmt.Println(message)
+func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	message := args["message"].Value
+	coefs := []int{-1, 25}				//	y = -x + 25
+
+	switch flags["process"].Value {
+	case "encrypt":
+		message = Map(affine, coefs, message)
+	case "decrypt":
+		message = Map(affine, coefs, message)
+	}
+
+	printOutput(message)
 }
 
 //	The callback function, shiftCipher, maps each alphabet
 //	letter to n-steps in the english alphabet.
-func shiftCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
+func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	message := args["message"].Value
+	key, _ := flags["key"].GetInt()
+	coefs := []int{0, key}
+
+	switch flags["process"].Value {
+	case "encrypt":
+		message = Map(affine, coefs, message)
+	case "decrypt":
+		message = Map(affine, coefs, message)
+	}
+
+	printOutput(message)
+}
 
 //	The callback function, vigenereCipher, maps each alphabet
 //	letter according to a string key which maps each character
