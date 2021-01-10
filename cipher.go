@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/thatisuday/commando"
+	"os"
 	"strconv"
 	"strings"
 	"unicode"
@@ -11,7 +13,7 @@ import (
 
 const (
 	//	File Directories
-	commonWords string = "Z:\\GitHub\\gematmw-go-cipher\\assets\\20k-edited-1k.txt"
+	mostCommonWords string = "Z:\\GitHub\\gematmw-go-cipher\\assets\\20k-edited-1k.txt"
 
 	//	ASCII codes needed for calculations
 	asciiA int = 'A'
@@ -78,6 +80,59 @@ func main() {
 	commando.Parse(nil)
 }
 
+//	The scanLines function scans a text file line-by-line and
+//	returns each line in a string slice.
+func scanLines(path string) ([]string, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err = file.Close(); err != nil {
+			panic(err)
+		}
+	}()
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+	var lines []string
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, nil
+}
+
+//	hasWord checks whether an output contains an actual
+//	existing word based on the firs 1_000 words from
+//	https://github.com/arvj9-uni/google-10000-english
+func hasWord(str string) bool {
+	words, err := scanLines(mostCommonWords)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, field := range strings.Fields(str) {
+		for _, word := range words {
+			if strings.ToLower(field) == word {
+				fmt.Println(field)
+				return true
+			}
+		}
+	}
+	return false
+}
+
+//	filterGibberish removes any output that does not satisfy
+//	the hasWord method
+func filterGibberish(possibleOutputs []string) []string {
+	var outputs []string
+	for _, possibleOutputs := range possibleOutputs {
+		if hasWord(possibleOutputs) {
+			outputs = append(outputs, possibleOutputs)
+		}
+	}
+	return outputs
+}
+
 //	printOutput displays the format for the cipher output.
 func printOutput(message interface{}) {
 	switch t := message.(type) {
@@ -129,12 +184,12 @@ func affine(char rune, a int, b int) rune {
 //	modified according to the mapping function. This is a
 //	modified version of the Map function found in the strings
 //	package.
-func Map(mapping func(rune, int, int) rune, coefs []int, s string) string {
+func Map(mapping func(rune, int, int) rune, coefficients []int, s string) string {
 	//	The output buffer acc is initialized on demand, the
 	//	first time a character differs.
 	var acc strings.Builder
 	for i, char := range s {
-		r := mapping(char, coefs[0], coefs[1])
+		r := mapping(char, coefficients[0], coefficients[1])
 		if r == char && char != utf8.RuneError {
 			continue
 		}
@@ -165,7 +220,7 @@ func Map(mapping func(rune, int, int) rune, coefs []int, s string) string {
 	}
 
 	for _, char := range s {
-		r := mapping(char, coefs[0], coefs[1])
+		r := mapping(char, coefficients[0], coefficients[1])
 
 		if r >= 0 {
 			//	common case
@@ -191,11 +246,11 @@ func affineCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 	//	initial setup
 	message := args["message"].Value
 	input, _ := flags["key"].GetString()
-	coefs := parseInput(input)
+	coefficients := parseInput(input)
 
 	switch flags["process"].Value {
 	case "encrypt":
-		message = Map(affine, coefs, message)
+		message = Map(affine, coefficients, message)
 	case "decrypt":
 		break
 	}
@@ -211,13 +266,13 @@ func affineCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 //	atbashCipher and determining the linear equation for it.
 func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
-	coefs := []int{-1, 25}				//	y = (-x + 25) mod26
+	coefficients := []int{-1, 25} //	y = (-x + 25) mod26
 
 	switch flags["process"].Value {
 	case "encrypt":
-		message = Map(affine, coefs, message)
+		message = Map(affine, coefficients, message)
 	case "decrypt":
-		message = Map(affine, coefs, message)
+		message = Map(affine, coefficients, message)
 	}
 
 	printOutput(message)
@@ -233,23 +288,41 @@ func atbashCipher(args map[string]commando.ArgValue, flags map[string]commando.F
 func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
 	key, _ := flags["key"].GetInt()
-	coefs := []int{0, key}	//	y =  (key) mod 26
+	coefficients := []int{0, key} //	y =  (key) mod 26
 
+	var possibleOutputs []string
 	switch flags["process"].Value {
 	case "encrypt":
-		message = Map(affine, coefs, message)
+		possibleOutputs = append(possibleOutputs, Map(affine, coefficients, message))
 	case "decrypt":
-		message = Map(affine, coefs, message)
+		//	missing shift key
+		if key == 0 {
+			for shift := 1; shift <= 25; shift++ {
+				coefficients = []int{0, shift}
+				possibleOutputs = append(possibleOutputs, Map(affine, coefficients, message))
+			}
+			possibleOutputs = filterGibberish(possibleOutputs)
+			break
+		}
+
+		directions := []int{-1, 1}
+		for _, dir := range directions {
+			//	when shift key is provided
+			coefficients = []int{0, key*dir}
+			possibleOutputs = append(possibleOutputs, Map(affine, coefficients, message))
+		}
+		possibleOutputs = filterGibberish(possibleOutputs)
 	}
 
-	printOutput(message)
+	printOutput(possibleOutputs)
 }
 
 //	The callback function, vigenereCipher, maps each alphabet
 //	letter according to a string key which maps each character
 //	differently compared to the regular shift cipher.
-func vigenereCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
+func vigenereCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
 
+}
 //	The callback function, railFenceCipher,
 func railFenceCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
 
