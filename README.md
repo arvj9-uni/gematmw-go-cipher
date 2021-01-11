@@ -1,3 +1,5 @@
+There is a pdf version of the documentation in the docs folder.
+
 # gematmw-go-cipher
 This is a CLI Application coded in the Go Programming Language \
 for my 1st term university project in GEMATMW(Mathematics in the Modern World) at De La Salle University Manila. \
