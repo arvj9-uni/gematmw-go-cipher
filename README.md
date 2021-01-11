@@ -1,4 +1,4 @@
-There is a pdf version of the documentation in the docs folder.
+There is a pdf version of the documentation in the `docs` folder.
 
 # gematmw-go-cipher
 This is a CLI Application coded in the Go Programming Language \
