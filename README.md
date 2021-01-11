@@ -7,7 +7,7 @@ encrypt and decrypt messages.
 
 ---
 # How To
-##Command Format
+## Command Format
 ```
 ciphers [ciphersystem] "message" [-k [key]] [-p [encrypt|decrypt]]
 ```
