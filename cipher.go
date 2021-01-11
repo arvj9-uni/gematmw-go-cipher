@@ -323,7 +323,7 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 
 /*
 	VIGENÈRE CIPHER
- */
+*/
 //	vigenereMap returns a copy of the string s with all its
 //	characters modified according to the mapping function. This
 //	is a modified version of the Map function found in the
@@ -403,34 +403,26 @@ func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando
 	printOutput(possibleOutputs)
 }
 
-//	The callback function, railFenceCipher,
-func railFenceCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
-	message := args["message"].Value
-	key, _ := flags["key"].GetInt()
-
-	//	Rail fence setup
+func railFence(message string, key int, process string) string {
 	var (
-		result  string
-		rail    = make([][]rune, key)
-		dirDown bool
-		row     int = 0
-		charPos int = 0
+		rail = make([][]rune, key)
+		result    string
+		dirDown   bool
+		row       int
 	)
+	//	setup of rail fence
 	for row = range rail {
 		rail[row] = make([]rune, len(message))
 	}
-	//	Rail fence initialization
 	row = 0
-	charPos = 0
-	for _, char := range message {
-		//	direction flow check
-		//	check if reached the roof or floor of the matrix
+	for col, char := range message {
+		//	direction flow check: this check when the sequence
+		//	hits the floor or the ceiling of the rail fence
 		if row == 0 || row == key-1 {
 			dirDown = !dirDown
 		}
 
-		rail[row][charPos] = rune(char)
-		charPos++
+		rail[row][col] = char
 
 		if dirDown {
 			row++
@@ -438,55 +430,97 @@ func railFenceCipher(args map[string]commando.ArgValue, flags map[string]command
 			row--
 		}
 	}
-	switch flags["process"].Value {
+
+	switch process {
 	case "encrypt":
-		for row = 0; row < key; row++ {
-			for charPos = range message {
-				if rail[row][charPos] != 0 {
-					result += string(rail[row][charPos])
+	case "e":
+		for row = range rail {
+			for _, char := range rail[row] {
+				if char != 0 {
+					result += string(char)
 				}
 			}
 		}
 	case "decrypt":
-		index := 0
-		//	change the diagonal places with the supposed
-		//	original decrypted message
-		for row = 0; row < key; row++ {
-			for charPos, char := range rail[row] {
-				if char != 0 && index < len(message) {
-					rail[row][charPos] = rune(message[index])
-					index++
+	case "d":
+		charPos := 0
+		//	changes the characters in the diagonals places with
+		//	the supposed original decrypted rail fence message
+		for row, line := range rail {
+			for col, char := range line {
+				if char != 0 && charPos < len(message) {
+					rail[row][col] = rune(message[charPos])
+					charPos++
 				}
 			}
 		}
 
-		//	reading the reverse engineered matrix and writing to output
+		//	reading the reverse engineered matrix and writing
+		//	to output
+		dirDown = false
 		row = 0
-		charPos = 0
-		for range message {
-			//	direction flow
+		for col := range message {
+			//	direction flow check: this check when the sequence
+			//	hits the floor or the ceiling of the rail fence
 			if row == 0 || row == key-1 {
-				dirDown = ! dirDown
+				dirDown = !dirDown
 			}
 
-			fmt.Print(rail[row][charPos])
-			if rail[row][charPos] != 0 {
-				result += string(rail[row][charPos])
-				charPos++
-			}
+			result += string(rail[row][col])
 
 			if dirDown {
 				row++
 			} else {
 				row--
 			}
- 		}
+		}
+	}
+	return result
+}
+
+//	The callback function, railFenceCipher,
+func railFenceCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	message := args["message"].Value
+	key, _ := flags["key"].GetInt()
+	process, _ := flags["process"].GetString()
+	var possibleOutputs []string
+
+	switch process {
+	case "encrypt":
+	case "e":
+		//	KeyError handling
+		if key > 1 {
+			possibleOutputs = append(possibleOutputs, railFence(message, key, process))
+		} else
+		if key == 1 {
+			possibleOutputs = append(possibleOutputs, message)
+		} else {
+			possibleOutputs = append(possibleOutputs, "Make sure to enter a key valid for encryption/decryption [key >= 2].")
+		}
+	case "decrypt":
+	case "d":
+		if searchCap := 10; key == 0 {
+			for key := 2; key <= searchCap; key++ {
+				possibleOutputs = append(possibleOutputs, railFence(message, key, process))
+			}
+			break
+		}
+		//	key = 1 does not do anything
+		if key == 1 {
+			possibleOutputs = append(possibleOutputs, message)
+			break
+		}
+
+		possibleOutputs = append(possibleOutputs, railFence(message, key, process))
+	default:
+		possibleOutputs = append(possibleOutputs, "Enter either [encrypt|decrypt] for the process flag.")
 	}
 
-	printOutput(result)
+	printOutput(possibleOutputs)
 }
 
 //	The callback function, rsaCipher,
-func rsaCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
-
+func rsaCipher(args map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
+	message := args["message"].Value
+	printOutput(message)
 }
