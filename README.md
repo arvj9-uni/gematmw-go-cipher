@@ -7,9 +7,14 @@ encrypt and decrypt messages.
 
 ---
 # How To
+## Setup
+In the terminal:
+### Windows
+```
+$ go get -u github.com/arvj9-uni/
+```
 
-
-__Command format is:__
+##Command Format
 ```
 ciphers [ciphersystem] "message" [-k [key]] [-p [encrypt|decrypt]]
 ```
