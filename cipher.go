@@ -152,8 +152,8 @@ func printOutput(message interface{}) {
 //	as needed.
 func parseInput(input string) []int {
 	output := make([]int, strings.Count(input, ",")+1)
-	for i, coeff := range strings.Split(input, ",") {
-		output[i], _ = strconv.Atoi(coeff)
+	for i, coefficient := range strings.Split(input, ",") {
+		output[i], _ = strconv.Atoi(coefficient)
 	}
 	return output
 }
@@ -321,17 +321,20 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 	printOutput(possibleOutputs)
 }
 
-//	vigenereMap returns a copy of the string s with all its characters
-//	modified according to the mapping function. This is a
-//	modified version of the Map function found in the strings
-//	package.
+/*
+	VIGENÈRE CIPHER
+ */
+//	vigenereMap returns a copy of the string s with all its
+//	characters modified according to the mapping function. This
+//	is a modified version of the Map function found in the
+//	strings package.
 func vigenereMap(mapping func(rune, int, int) rune, key string, s string) string {
 	//	The output buffer acc is initialized on demand, the
 	//	first time a character differs.
 	var acc strings.Builder
 	var charShift int
 	for i, char := range s {
-		charShift = int(key[i%len(key)])
+		charShift = int(key[i%len(key)]) - asciiA
 		r := mapping(char, 1, charShift)
 		if r == char && char != utf8.RuneError {
 			continue
@@ -363,7 +366,7 @@ func vigenereMap(mapping func(rune, int, int) rune, key string, s string) string
 	}
 
 	for i, char := range s {
-		charShift = int(key[i%len(key)])
+		charShift = int(key[i%len(key)]) - asciiA
 		r := mapping(char, 1, charShift)
 
 		if r >= 0 {
@@ -388,10 +391,10 @@ func vigenereMap(mapping func(rune, int, int) rune, key string, s string) string
 func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
 	message := args["message"].Value
 	key, _ := flags["key"].GetString()
-	key = strings.ToLower(key)
+	key = strings.ToUpper(key)
 
 	var possibleOutputs []string
-	switch flags["message"].Value {
+	switch flags["process"].Value {
 	case "encrypt":
 		possibleOutputs = append(possibleOutputs, vigenereMap(affine, key, message))
 	case "decrypt":
@@ -401,7 +404,56 @@ func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando
 }
 
 //	The callback function, railFenceCipher,
-func railFenceCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
+func railFenceCipher(args map[string]commando.ArgValue, flags map[string]commando.FlagValue) {
+	message := args["message"].Value
+	key, _ := flags["key"].GetInt()
+
+	//	Rail fence setup
+	var (
+		result  string
+		rail    = make([][]rune, key)
+		dirDown bool
+		row     int = 0
+		charPos int = 0
+	)
+	for _row := range rail {
+		rail[_row] = make([]rune, len(message))
+	}
+	switch flags["process"].Value {
+	case "encrypt":
+		//	Rail fence initialization
+		for i := 0; i < len(message); i++ {
+			//	direction flow check
+			//	check if reached the roof or floor of the matrix
+			if row == 0 || row == key-1 {
+				dirDown = !dirDown
+			}
+
+			rail[row][charPos] = rune(message[i])
+			charPos++
+
+			if dirDown {
+				row++
+			} else {
+				row--
+			}
+		}
+
+		for _row := 0; _row < key; _row++ {
+			for _charPos := 0; _charPos < len(message); _charPos++ {
+				if rail[_row][_charPos] != 0 {
+					result += string(rail[_row][_charPos])
+				}
+			}
+		}
+	case "decrypt":
+		break
+	}
+
+	printOutput(result)
+}
 
 //	The callback function, rsaCipher,
-func rsaCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {}
+func rsaCipher(_ map[string]commando.ArgValue, _ map[string]commando.FlagValue) {
+
+}
