@@ -13,9 +13,18 @@ __Command format is:__
 ```
 ciphers [ciphersystem] "message" [-k [key]] [-p [encrypt|decrypt]]
 ```
-| Ciphersystem | Arguments | Flags |
-| ------------ | ----------| ----- |
+| Ciphersystem  | Arguments | Flags |
+| :-----------: | :-------: | :---: |
+| affine        | message   | key(number,number), process |
+| atbash        | message   |           n/a        |
+| shift         | message   | key(number), process |
+| vigenere      | message   | key(string), process |
+| rail          | message   | key(number), process |
+| rsa*          | message   | key(number,number), process |
 
+*in-development
+
+__NOTE: No spaces for key inputs with 2 numbers__ 
 
 ---
 # References
