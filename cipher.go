@@ -416,38 +416,71 @@ func railFenceCipher(args map[string]commando.ArgValue, flags map[string]command
 		row     int = 0
 		charPos int = 0
 	)
-	for _row := range rail {
-		rail[_row] = make([]rune, len(message))
+	for row = range rail {
+		rail[row] = make([]rune, len(message))
+	}
+	//	Rail fence initialization
+	row = 0
+	charPos = 0
+	for _, char := range message {
+		//	direction flow check
+		//	check if reached the roof or floor of the matrix
+		if row == 0 || row == key-1 {
+			dirDown = !dirDown
+		}
+
+		rail[row][charPos] = rune(char)
+		charPos++
+
+		if dirDown {
+			row++
+		} else {
+			row--
+		}
 	}
 	switch flags["process"].Value {
 	case "encrypt":
-		//	Rail fence initialization
-		for i := 0; i < len(message); i++ {
-			//	direction flow check
-			//	check if reached the roof or floor of the matrix
+		for row = 0; row < key; row++ {
+			for charPos = range message {
+				if rail[row][charPos] != 0 {
+					result += string(rail[row][charPos])
+				}
+			}
+		}
+	case "decrypt":
+		index := 0
+		//	change the diagonal places with the supposed
+		//	original decrypted message
+		for row = 0; row < key; row++ {
+			for charPos, char := range rail[row] {
+				if char != 0 && index < len(message) {
+					rail[row][charPos] = rune(message[index])
+					index++
+				}
+			}
+		}
+
+		//	reading the reverse engineered matrix and writing to output
+		row = 0
+		charPos = 0
+		for range message {
+			//	direction flow
 			if row == 0 || row == key-1 {
-				dirDown = !dirDown
+				dirDown = ! dirDown
 			}
 
-			rail[row][charPos] = rune(message[i])
-			charPos++
+			fmt.Print(rail[row][charPos])
+			if rail[row][charPos] != 0 {
+				result += string(rail[row][charPos])
+				charPos++
+			}
 
 			if dirDown {
 				row++
 			} else {
 				row--
 			}
-		}
-
-		for _row := 0; _row < key; _row++ {
-			for _charPos := 0; _charPos < len(message); _charPos++ {
-				if rail[_row][_charPos] != 0 {
-					result += string(rail[_row][_charPos])
-				}
-			}
-		}
-	case "decrypt":
-		break
+ 		}
 	}
 
 	printOutput(result)
