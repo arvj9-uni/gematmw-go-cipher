@@ -328,13 +328,18 @@ func shiftCipher(args map[string]commando.ArgValue, flags map[string]commando.Fl
 //	characters modified according to the mapping function. This
 //	is a modified version of the Map function found in the
 //	strings package.
-func vigenereMap(mapping func(rune, int, int) rune, key string, s string) string {
+func vigenereMap(mapping func(rune, int, int) rune, key string, s string , p string) string {
+	reverse := 1
+	if p == "decrypt" {
+		reverse *= -1
+	}
+
 	//	The output buffer acc is initialized on demand, the
 	//	first time a character differs.
 	var acc strings.Builder
 	var charShift int
 	for i, char := range s {
-		charShift = int(key[i%len(key)]) - asciiA
+		charShift = (int(key[i%len(key)]) - asciiA)*reverse
 		r := mapping(char, 1, charShift)
 		if r == char && char != utf8.RuneError {
 			continue
@@ -366,7 +371,7 @@ func vigenereMap(mapping func(rune, int, int) rune, key string, s string) string
 	}
 
 	for i, char := range s {
-		charShift = int(key[i%len(key)]) - asciiA
+		charShift = (int(key[i%len(key)]) - asciiA)*reverse
 		r := mapping(char, 1, charShift)
 
 		if r >= 0 {
@@ -392,13 +397,16 @@ func vigenereCipher(args map[string]commando.ArgValue, flags map[string]commando
 	message := args["message"].Value
 	key, _ := flags["key"].GetString()
 	key = strings.ToUpper(key)
+	process, _ := flags["process"].GetString()
 
 	var possibleOutputs []string
-	switch flags["process"].Value {
-	case "encrypt":
-		possibleOutputs = append(possibleOutputs, vigenereMap(affine, key, message))
-	case "decrypt":
-		possibleOutputs = append(possibleOutputs, vigenereMap(affine, key, message))
+	switch process {
+	case "encrypt": case "e":
+		process = "encrypt"
+		possibleOutputs = append(possibleOutputs, vigenereMap(affine, key, message, process))
+	case "decrypt": case "d":
+		process = "decrypt"
+		possibleOutputs = append(possibleOutputs, vigenereMap(affine, key, message, process))
 	}
 	printOutput(possibleOutputs)
 }
